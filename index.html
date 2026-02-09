@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Mission</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>SNAKE MISSION</h1>
+        <div class="score-board">
+            <div>Score: <span id="score">0</span></div>
+            <div>Goal: 4</div>
+        </div>
+        
+        <div class="canvas-wrapper">
+            <canvas id="snakeGame" width="320" height="320"></canvas>
+            <div id="gameOverScreen" class="overlay hidden">
+                <h2>Game Over</h2>
+                <button class="restart-btn" onclick="resetGame()">RESTART</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn up" onclick="setDirection('UP')">▲</button>
+            <div class="mid-row">
+                <button class="btn left" onclick="setDirection('LEFT')">◀</button>
+                <button class="btn down" onclick="setDirection('DOWN')">▼</button>
+                <button class="btn right" onclick="setDirection('RIGHT')">▶</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
