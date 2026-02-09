@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Surprise ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #fff0f3; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Poppins', sans-serif; overflow: hidden; }
+        .heart { position: absolute; color: #ffb3c1; font-size: 20px; animation: float 6s linear infinite; z-index: 1; pointer-events: none; }
+        @keyframes float { 0% { transform: translateY(110vh); opacity: 1; } 100% { transform: translateY(-10vh); opacity: 0; } }
+
+        #name-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 240, 243, 0.98); z-index: 100;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .modal-content { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 35px rgba(255, 77, 109, 0.2); text-align: center; border: 2px solid #ffccd5; width: 85%; max-width: 350px; }
+        input { padding: 15px; width: 85%; border: 2px solid #ffccd5; border-radius: 12px; font-family: 'Poppins'; outline: none; margin-bottom: 20px; text-align: center; font-size: 1rem; }
+        .go-btn { background: #ff4d6d; color: white; border: none; padding: 12px 35px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 1rem; }
+
+        #content-wrapper { display: none; opacity: 0; text-align: center; z-index: 10; transition: 1.5s; width: 100%; }
+        #envelope-box { text-align: center; }
+        #envelope { 
+            width: 280px; height: 180px; background: #ff4d6d; position: relative; 
+            cursor: pointer; display: flex; justify-content: center; align-items: center; 
+            border-radius: 0 0 15px 15px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+        }
+        #envelope::before { 
+            content: ""; position: absolute; top: -100px; left: 0; 
+            border-left: 140px solid transparent; border-right: 140px solid transparent; 
+            border-bottom: 100px solid #ff4d6d; 
+        }
+
+        .card { 
+            background: white; padding: 40px 25px; border-radius: 40px; 
+            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.25); max-width: 500px; 
+            width: 90%; border: 2px solid #ffccd5; display: none; margin: 20px auto;
+            max-height: 70vh; overflow-y: auto;
+        }
+        
+        h1 { font-family: 'Dancing Script', cursive; color: #ff4d6d; font-size: 2.5rem; margin-bottom: 15px; }
+        .message-content { color: #4a4a4a; font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="heart-container"></div>
+    
+    <audio id="myAudio" loop preload="auto">
+        <source src="glue.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="name-modal">
+        <div class="modal-content">
+            <h3 style="color: #ff4d6d; margin-top: 0;">A gift for you...</h3>
+            <input type="text" id="userName" placeholder="What is your name?" autocomplete="off">
+            <button class="go-btn" onclick="startExperience()">Open surprise</button>
+        </div>
+    </div>
+
+    <div id="content-wrapper">
+        <div id="envelope-box">
+            <div id="envelope" onclick="revealCard()">
+                <div style="font-size: 55px; z-index: 5;">💌</div>
+            </div>
+            <p style="color: #ff4d6d; margin-top: 40px; font-weight: bold;">Tap the letter to read...</p>
+        </div>
+
+        <div class="card" id="mainCard">
+            <h1 id="valentine-greeting">Happy Valentine's</h1>
+            <div class="message-content" id="typewriter"></div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('myAudio');
+
+        function startExperience() {
+            const nameInput = document.getElementById('userName').value;
+            if (!nameInput.trim()) {
+                alert("Please enter your name ❤️");
+                return;
+            }
+
+            document.getElementById('valentine-greeting').innerText = `Happy Valentine's, ${nameInput}!`;
+            audio.play().catch(() => console.log("Audio waiting for user interaction."));
+
+            document.getElementById('name-modal').style.display = 'none';
+            const wrapper = document.getElementById('content-wrapper');
+            wrapper.style.display = 'block';
+            setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
+        }
+
+        function revealCard() {
+            audio.play();
+            document.getElementById('envelope-box').style.display = 'none';
+            const card = document.getElementById('mainCard');
+            card.style.display = 'block';
+            
+            // Short, sweet, and supportive message
+            const fullMessage = `I wanted to send you something special today to remind you how much you're appreciated.\n\nYou're an incredible person, and I'm so grateful to have you in my life. I'll always be here to support you, listen to you, and cheer you on through everything.\n\nI hope today brings you as much joy as you bring to those around you. Enjoy every moment! ❤️`;
+
+            let i = 0;
+            const speed = 40; 
+            const container = document.getElementById('typewriter');
+
+            function type() {
+                if (i < fullMessage.length) {
+                    container.innerHTML += fullMessage.charAt(i);
+                    i++;
+                    card.scrollTop = card.scrollHeight;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Floating hearts background
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+            document.getElementById('heart-container').appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createHeart, 400);
+    </script>
+</body>
+</html>
