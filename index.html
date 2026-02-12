@@ -3,34 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Snake Mission</title>
+    <title>Snake Surprise ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
-        <h1>SNAKE MISSION</h1>
-        <div class="score-board">
-            <div>Score: <span id="score">0</span></div>
-            <div>Goal: 4</div>
+
+    <audio id="eatSound" preload="auto"><source src="eat.mp3" type="audio/mpeg"></audio>
+    <audio id="turnSound" preload="auto"><source src="turn.mp3" type="audio/mpeg"></audio>
+    <audio id="failSound" preload="auto"><source src="fail.mp3" type="audio/mpeg"></audio>
+
+    <div id="game-container">
+        <div class="stats-wrapper">
+            <div class="stats">Hearts: <span id="score">0</span> / 4 ❤️</div>
         </div>
         
-        <div class="canvas-wrapper">
-            <canvas id="snakeGame" width="320" height="320"></canvas>
-            <div id="gameOverScreen" class="overlay hidden">
-                <h2>Game Over</h2>
-                <button class="restart-btn" onclick="resetGame()">RESTART</button>
-            </div>
-        </div>
+        <canvas id="snakeGame" width="400" height="400"></canvas>
 
-        <div class="controls">
-            <button class="btn up" onclick="setDirection('UP')">▲</button>
-            <div class="mid-row">
-                <button class="btn left" onclick="setDirection('LEFT')">◀</button>
-                <button class="btn down" onclick="setDirection('DOWN')">▼</button>
-                <button class="btn right" onclick="setDirection('RIGHT')">▶</button>
+        <div id="external-controls">
+            <button class="ctrl-btn" id="upBtn">▲</button>
+            <div class="ctrl-row">
+                <button class="ctrl-btn" id="leftBtn">◀</button>
+                <button class="ctrl-btn" id="downBtn">▼</button>
+                <button class="ctrl-btn" id="rightBtn">▶</button>
+            </div>
+            
+            <div id="gameOverScreen" class="hidden">
+                <p>Try again, love! ✨</p>
+                <button onclick="init()" class="reset-btn">Reset</button>
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
