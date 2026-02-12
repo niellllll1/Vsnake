@@ -1,20 +1,34 @@
 const canvas = document.getElementById("snakeGame");
 const ctx = canvas.getContext("2d");
 const scoreElement = document.getElementById("score");
-const gameOverScreen = document.getElementById("gameOverScreen");
 
-const box = 20; 
-let score, gameActive, gameStarted, snake, d, gameLoop, foodItems;
+// Local Audio Elements
+const eatSound = document.getElementById("eatSound");
+const turnSound = document.getElementById("turnSound");
+const failSound = document.getElementById("failSound");
+
+const box = 20;
+let score, gameActive, gameStarted, snake, d, gameLoop, food;
+
+const TARGET_SCORE = 4;
+const REDIRECT_URL = "Vpage.html";
+
+// Mobile browsers require a "warm up" tap to allow audio
+function unlockAudio() {
+    [eatSound, turnSound, failSound].forEach(s => {
+        s.play().then(() => { s.pause(); s.currentTime = 0; }).catch(()=>{});
+    });
+}
 
 function init() {
     score = 0;
     scoreElement.innerHTML = score;
     gameActive = true;
     gameStarted = false;
-    snake = [{ x: 8 * box, y: 8 * box }];
     d = null;
-    foodItems = [getRandomPos(), getRandomPos()]; // 2 random apples
-    gameOverScreen.classList.add("hidden");
+    snake = [{ x: 10 * box, y: 10 * box }, { x: 10 * box, y: 11 * box }];
+    food = getRandomPos();
+    document.getElementById("gameOverScreen").classList.add("hidden");
     if(gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(draw, 140);
 }
@@ -26,86 +40,95 @@ function getRandomPos() {
     };
 }
 
-function setDirection(newDir) {
-    if (!gameActive) return;
-    gameStarted = true;
-    if(newDir == "LEFT" && d != "RIGHT") d = "LEFT";
-    else if(newDir == "UP" && d != "DOWN") d = "UP";
-    else if(newDir == "RIGHT" && d != "LEFT") d = "RIGHT";
-    else if(newDir == "DOWN" && d != "UP") d = "DOWN";
-}
-
-document.addEventListener("keydown", (e) => {
-    const keys = { 37: "LEFT", 38: "UP", 39: "RIGHT", 40: "DOWN" };
-    if (keys[e.keyCode]) setDirection(keys[e.keyCode]);
-});
-
 function draw() {
     if (!gameActive) return;
-    ctx.fillStyle = "#16213e";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Apples
-    ctx.fillStyle = "#ff4d4d";
-    foodItems.forEach(item => ctx.fillRect(item.x, item.y, box, box));
+    // Food (Heart)
+    ctx.font = "20px serif";
+    ctx.fillText("❤️", food.x, food.y + box - 2);
 
-    // Draw Snake
+    // Snake Body
     snake.forEach((part, i) => {
-        ctx.fillStyle = (i == 0) ? "#4ecca3" : "#45b293";
-        ctx.fillRect(part.x, part.y, box, box);
+        const isHead = i === 0;
+        ctx.fillStyle = isHead ? "#ff758c" : "#ffb3c1";
+        ctx.beginPath();
+        ctx.roundRect(part.x + 1, part.y + 1, box - 2, box - 2, 8);
+        ctx.fill();
+        if (isHead) { // Eyes
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(part.x + 6, part.y + 7, 2, 0, Math.PI * 2);
+            ctx.arc(part.x + 14, part.y + 7, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
     });
 
-    if (!gameStarted) {
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.font = "16px Arial";
-        ctx.fillText("TAP ARROWS TO START", canvas.width/2, canvas.height/2);
-        return;
-    }
+    if (!gameStarted) return;
 
-    let snakeX = snake[0].x;
-    let snakeY = snake[0].y;
-    if(d == "LEFT") snakeX -= box;
-    if(d == "UP") snakeY -= box;
-    if(d == "RIGHT") snakeX += box;
-    if(d == "DOWN") snakeY += box;
+    let sX = snake[0].x;
+    let sY = snake[0].y;
+    if(d === "UP") sY -= box;
+    if(d === "DOWN") sY += box;
+    if(d === "LEFT") sX -= box;
+    if(d === "RIGHT") sX += box;
 
-    // Wall Warp
-    if (snakeX < 0) snakeX = canvas.width - box;
-    else if (snakeX >= canvas.width) snakeX = 0;
-    if (snakeY < 0) snakeY = canvas.height - box;
-    else if (snakeY >= canvas.height) snakeY = 0;
+    // Screen wrapping
+    if (sX < 0) sX = canvas.width - box; else if (sX >= canvas.width) sX = 0;
+    if (sY < 0) sY = canvas.height - box; else if (sY >= canvas.height) sY = 0;
 
-    let newHead = { x: snakeX, y: snakeY };
+    let head = { x: sX, y: sY };
 
-    // Self-Collision
-    if (snake.some((p, i) => i !== 0 && p.x === snakeX && p.y === snakeY)) {
+    // Death Check
+    if (snake.some(p => p.x === head.x && p.y === head.y)) {
         gameActive = false;
-        clearInterval(gameLoop);
-        gameOverScreen.classList.remove("hidden");
+        failSound.play().catch(()=>{}); // Optional local fail sound
+        document.getElementById("gameOverScreen").classList.remove("hidden");
         return;
     }
 
-    // Eat Apple Logic
-    let ateFood = false;
-    for(let i = 0; i < foodItems.length; i++) {
-        if(snakeX === foodItems[i].x && snakeY === foodItems[i].y) {
-            score++;
-            scoreElement.innerHTML = score;
-            if (score >= 4) {
-                clearInterval(gameLoop);
-                window.location.href = "Vpage.html";
-                return;
-            }
-            foodItems[i] = getRandomPos();
-            ateFood = true;
-            break; 
-        }
-    }
+    // Eat Check
+    if (sX === food.x && sY === food.y) {
+        score++;
+        scoreElement.innerHTML = score;
+        
+        // Play EAT sound
+        eatSound.currentTime = 0;
+        eatSound.play().catch(()=>{});
 
-    if(!ateFood) snake.pop();
-    snake.unshift(newHead);
+        if (score >= TARGET_SCORE) {
+            gameActive = false;
+            window.location.href = REDIRECT_URL;
+            return;
+        }
+        food = getRandomPos();
+    } else {
+        snake.pop();
+    }
+    snake.unshift(head);
 }
 
-function resetGame() { init(); }
+function setDir(newDir) {
+    if (!gameStarted) unlockAudio();
+    
+    // Play TURN sound only if direction actually changes
+    if (d !== newDir) { 
+        turnSound.currentTime = 0;
+        turnSound.play().catch(()=>{}); 
+    }
+
+    gameStarted = true;
+    if(newDir === "UP" && d !== "DOWN") d = "UP";
+    if(newDir === "DOWN" && d !== "UP") d = "DOWN";
+    if(newDir === "LEFT" && d !== "RIGHT") d = "LEFT";
+    if(newDir === "RIGHT" && d !== "LEFT") d = "RIGHT";
+}
+
+["upBtn", "downBtn", "leftBtn", "rightBtn"].forEach(id => {
+    const btn = document.getElementById(id);
+    const dir = id.replace("Btn", "").toUpperCase();
+    btn.onclick = (e) => { e.preventDefault(); setDir(dir); };
+    btn.ontouchstart = (e) => { e.preventDefault(); setDir(dir); };
+});
+
 init();
