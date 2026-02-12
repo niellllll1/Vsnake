@@ -1,66 +1,108 @@
-body {
+:root {
+    --bg-deep: #2d344b;
+    --accent-pink: #ff758c;
+    --glass: rgba(255, 255, 255, 0.1);
+}
+
+body { 
+    background-color: var(--bg-deep); 
+    margin: 0; 
+    padding: 0;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    font-family: 'Poppins', sans-serif; 
+    overflow: hidden;
+    touch-action: none; /* Prevents screen bouncing on mobile */
+}
+
+#game-container {
+    background: var(--glass);
+    padding: 25px 15px;
+    border-radius: 40px;
+    border: 2.5px solid var(--accent-pink);
+    box-shadow: 0 0 30px rgba(255, 117, 140, 0.2);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    z-index: 10;
+}
+
+.stats { 
+    background: white; 
+    color: var(--accent-pink); 
+    padding: 6px 20px; 
+    border-radius: 50px; 
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+canvas { 
+    background-color: #1e2235;
+    /* Checkerboard Pattern CSS */
+    background-image: 
+        linear-gradient(45deg, #252a41 25%, transparent 25%), 
+        linear-gradient(-45deg, #252a41 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #252a41 75%), 
+        linear-gradient(-45deg, transparent 75%, #252a41 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+    
+    border-radius: 20px; 
+    width: 100%;
+    height: auto;
+    display: block;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+#external-controls {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.ctrl-row { display: flex; gap: 10px; }
+
+.ctrl-btn {
+    width: 55px;
+    height: 55px;
+    background: rgba(255, 117, 140, 0.15);
+    border: 2px solid var(--accent-pink);
+    color: white;
+    border-radius: 15px;
+    font-size: 1.1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #1a1a2e;
-    color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
-    touch-action: manipulation;
+    transition: 0.1s;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.game-container { text-align: center; width: 95%; max-width: 400px; }
-
-.score-board {
-    display: flex;
-    justify-content: space-around;
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #4ecca3;
-    font-weight: bold;
+.ctrl-btn:active {
+    background: var(--accent-pink);
+    transform: scale(0.9);
 }
 
-.canvas-wrapper { position: relative; display: inline-block; width: 100%; }
-
-canvas {
-    border: 3px dashed #4ecca3;
-    background-color: #16213e;
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(26, 26, 46, 0.9);
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    border-radius: 8px;
-}
-
-.hidden { display: none; }
-
-.restart-btn {
-    padding: 12px 24px;
-    background: #4ecca3;
-    color: #1a1a2e;
+#gameOverScreen p { color: white; margin: 10px 0; font-weight: 600; font-size: 0.9rem; }
+.reset-btn {
+    background: white;
+    color: var(--bg-deep);
     border: none;
-    border-radius: 5px;
-    font-weight: bold;
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
 }
 
-.controls { margin-top: 15px; }
-.mid-row { display: flex; justify-content: center; gap: 10px; }
+.hidden { display: none !important; }
 
-.btn {
-    width: 65px; height: 65px;
-    background: #4ecca3; border: none;
-    border-radius: 50%; font-size: 24px;
-    margin: 5px; color: #1a1a2e;
-    box-shadow: 0 4px #2d9675;
-}
-
-.btn:active { transform: translateY(2px); box-shadow: 0 1px #2d9675; }
+/* Floating Background Hearts */
+.heart-bg { position: absolute; color: rgba(255, 117, 140, 0.2); animation: float 8s linear infinite; pointer-events: none; z-index: 1; }
+@keyframes float { 0% { transform: translateY(110vh); } 100% { transform: translateY(-10vh); } }
